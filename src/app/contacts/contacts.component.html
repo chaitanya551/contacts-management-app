@@ -1,1 +1,17 @@
-<p>contacts works!</p>
+<div class="container">
+    <h1>Contacts Management</h1>
+  
+    <button class="btn btn-success mb-3" (click)="selectedContact = null">New</button>
+  
+    <app-contact-form
+      [contact]="selectedContact"
+      (saveContact)="addOrUpdateContact($event)"
+    ></app-contact-form>
+  
+    <app-contact-list
+      [contacts]="contacts"
+      (editContact)="editContact($event)"
+      (deleteContact)="deleteContact($event)"
+    ></app-contact-list>
+  </div>
+  
