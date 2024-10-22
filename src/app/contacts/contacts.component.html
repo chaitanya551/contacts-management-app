@@ -1,16 +1,18 @@
 <div class="container">
     <h1>Contacts Management</h1>
   
-    <button type="button" class="btn btn-success mb-3" (click)="openModal()">New</button>
-  
-    <div *ngIf="isModalOpen" class="modal fade show" id="newContactModal" tabindex="-1" aria-labelledby="newContactModalLabel" aria-hidden="true" style="display: block;">
+    <button type="button" class="btn btn-success mb-3" (click)="openModal()">
+      New
+    </button>
+    
+    <div class="modal fade" id="newContactModal" tabindex="-1" aria-labelledby="newContactModalLabel" aria-hidden="true" [ngClass]="{'show': isModalOpen}" style="display: {{isModalOpen ? 'block' : 'none'}};">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header justify-content-between">
-            <h5 class="modal-title" id="newContactModalLabel">Add/Edit Contact</h5>
+          <div class="modal-header">
+            <h5 class="modal-title" id="newContactModalLabel">{{ selectedContact ? 'Edit Contact' : 'New Contact' }}</h5>
             <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body">            
             <app-contact-form [contact]="selectedContact" (saveContact)="addOrUpdateContact($event)"></app-contact-form>
           </div>
         </div>
@@ -18,5 +20,16 @@
     </div>
   
     <app-contact-list [contacts]="contacts" (editContact)="editContact($event)" (deleteContact)="deleteContact($event)"></app-contact-list>
+  
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1000;">
+      <div id="liveToast" class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ toastMessage }}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="hideToast()" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
   </div>
   
