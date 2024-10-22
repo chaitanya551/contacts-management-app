@@ -4,7 +4,17 @@
     <button type="button" class="btn btn-success mb-3" (click)="openModal()">
       New
     </button>
-    
+  
+    <div class="form-group mb-3">
+      <input type="text" class="form-control" placeholder="Search contacts..." [(ngModel)]="searchText" (input)="filterContacts()">
+    </div>
+  
+    <div class="mb-3">
+      <button class="btn btn-primary me-2" (click)="sortContacts('firstName')">Sort by First Name</button>
+      <button class="btn btn-primary me-2" (click)="sortContacts('lastName')">Sort by Last Name</button>
+      <button class="btn btn-primary" (click)="sortContacts('email')">Sort by Email</button>
+    </div>
+  
     <div class="modal fade" id="newContactModal" tabindex="-1" aria-labelledby="newContactModalLabel" aria-hidden="true" [ngClass]="{'show': isModalOpen}" style="display: {{isModalOpen ? 'block' : 'none'}};">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -19,7 +29,40 @@
       </div>
     </div>
   
-    <app-contact-list [contacts]="contacts" (editContact)="editContact($event)" (deleteContact)="deleteContact($event)"></app-contact-list>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contact of paginatedContacts">
+          <td>{{ contact.id }}</td>
+          <td>{{ contact.firstName }}</td>
+          <td>{{ contact.lastName }}</td>
+          <td>{{ contact.email }}</td>
+          <td>
+            <button class="btn btn-primary" (click)="editContact(contact.id)">Edit</button>
+            <button class="btn btn-danger" (click)="deleteContact(contact.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <nav aria-label="Page navigation" class="mt-3">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link" (click)="previousPage()">Previous</button>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link" (click)="nextPage()">Next</button>
+        </li>
+      </ul>
+    </nav>
   
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1000;">
       <div id="liveToast" class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">

@@ -9,9 +9,15 @@ import { Contact } from '../models/contact.model';
 })
 export class ContactsComponent implements OnInit {
   contacts: Contact[] = [];
+  filteredContacts: Contact[] = [];
   selectedContact: Contact | null = null;
   isModalOpen = false;
   toastMessage: string = '';
+
+  searchText: string = '';
+  contactsPerPage = 5;
+  currentPage = 1;
+  totalPages = 1;
 
   constructor(private contactService: ContactService) {}
 
@@ -23,6 +29,8 @@ export class ContactsComponent implements OnInit {
     this.contactService.getContacts().subscribe(
       (contacts) => {
         this.contacts = contacts;
+        this.filteredContacts = contacts;
+        this.totalPages = Math.ceil(this.filteredContacts.length / this.contactsPerPage);
         this.showToast('Contacts loaded successfully!');
       },
       (error) => {
@@ -39,7 +47,6 @@ export class ContactsComponent implements OnInit {
   closeModal(): void {
     this.isModalOpen = false;
   }
-
 
   addOrUpdateContact(contact: Contact): void {
     if (this.selectedContact) {
@@ -92,6 +99,55 @@ export class ContactsComponent implements OnInit {
     );
   }
 
+  filterContacts(): void {
+    if (this.searchText.trim()) {
+      this.filteredContacts = this.contacts.filter((contact) =>
+        contact.firstName.toLowerCase().includes(this.searchText.toLowerCase()) ||
+        contact.lastName.toLowerCase().includes(this.searchText.toLowerCase()) ||
+        contact.email.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    } else {
+      this.filteredContacts = this.contacts;
+    }
+    this.totalPages = Math.ceil(this.filteredContacts.length / this.contactsPerPage);
+  }
+
+  sortContacts(property: keyof Contact): void {
+    this.filteredContacts.sort((a: Contact, b: Contact) => {
+      const valueA = a[property];
+      const valueB = b[property];
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+      }
+      if (valueA < valueB) {
+        return -1;
+      }
+      if (valueA > valueB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  
+
+  get paginatedContacts(): Contact[] {
+    const start = (this.currentPage - 1) * this.contactsPerPage;
+    const end = start + this.contactsPerPage;
+    return this.filteredContacts.slice(start, end);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
   showToast(message: string, isError: boolean = false): void {
     this.toastMessage = message;
     const toastElement = document.getElementById('liveToast');
@@ -101,7 +157,6 @@ export class ContactsComponent implements OnInit {
       toastElement.classList.add(isError ? 'bg-danger' : 'bg-primary');
     }
 
-
     setTimeout(() => this.hideToast(), 3000);
   }
 
@@ -110,5 +165,5 @@ export class ContactsComponent implements OnInit {
     if (toastElement) {
       toastElement.classList.remove('show');
     }
-  }
+}
 }
