@@ -12,6 +12,16 @@ export class ContactsComponent {
     { id: 2, firstName: 'Peter', lastName: 'Pan', email: 'peter.pan@neverland.com' }
   ];
   selectedContact: any = null;
+  isModalOpen = false;
+
+  openModal(): void {
+    this.selectedContact = null; 
+    this.isModalOpen = true;
+  }
+  
+  closeModal(): void {
+    this.isModalOpen = false;
+  }
 
   addOrUpdateContact(contact: any): void {
     if (this.selectedContact) {
@@ -22,10 +32,13 @@ export class ContactsComponent {
       const newId = this.contacts.length > 0 ? Math.max(...this.contacts.map(c => c.id)) + 1 : 0;
       this.contacts.push({ ...contact, id: newId });
     }
+
+    this.closeModal();
   }
 
   editContact(contactId: number): void {
     this.selectedContact = this.contacts.find(c => c.id === contactId);
+    this.openModal();
   }
 
   deleteContact(contactId: number): void {
